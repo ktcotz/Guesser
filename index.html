@@ -81,7 +81,7 @@
           </div>
 
           <div class="game__start">
-            <p class="game__message">Too low!</p>
+            <p class="game__message" data-message>Waiting...</p>
             <p class="game__range">Between (1-20)</p>
             <div class="game__input-container">
               <input
@@ -90,6 +90,7 @@
                 id="guess"
                 class="game__input"
                 required
+                data-guess
               />
               <label for="guess" class="game__label">Guess number</label>
             </div>
@@ -113,10 +114,11 @@
                 />
               </svg>
             </button>
-            <button class="btn btn--check">Check</button>
+            <button class="btn btn--check" data-check>Check</button>
           </div>
         </div>
       </div>
     </main>
+    <script src="./app/app.js"></script>
   </body>
 </html>
