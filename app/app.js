@@ -17,6 +17,9 @@ var handleGuesserGame = function () {
             throw new Error(Errors.NOT_FOUND_GUESS_INPUT);
         }
         var number = Number(guessInput.value);
+        if (Number.isNaN(number)) {
+            throw new Error(Errors.INVALID_INPUT);
+        }
         if (!number) {
             throw new Error(Errors.EMPTY_INPUT);
         }
