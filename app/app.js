@@ -7,9 +7,18 @@ var Errors;
     Errors["NUMBER_TO_HIGH"] = "Too high!";
     Errors["END_GAME"] = "Game just finished!";
 })(Errors || (Errors = {}));
+var Messages;
+(function (Messages) {
+    Messages["CORRECT_GUESS"] = "Correct! \uD83D\uDE0A";
+    Messages["WAITING"] = "Waiting... \u270C\uFE0F";
+})(Messages || (Messages = {}));
 var config = {
     MIN: 1,
     MAX: 20,
+    INITIAL_SCORE: 0,
+    INITIAL_LIVES: 5,
+    INITIAL_HIGHSCORE: 0,
+    LOST_GAME_LIVES: 0,
 };
 var handleGuesserGame = function () {
     var generateRandomNumber = function (min, max) {
@@ -62,7 +71,7 @@ var handleGuesserGame = function () {
         if (highscore <= score) {
             highscore = score;
         }
-        score = 0;
+        score = config.INITIAL_SCORE;
         setUI();
     };
     var clearInput = function () {
@@ -77,14 +86,14 @@ var handleGuesserGame = function () {
     var succesfullUI = function () {
         score++;
         randomNumber = generateRandomNumber(config.MIN, config.MAX);
-        setMessage("Correct!");
+        setMessage(Messages.CORRECT_GUESS);
         setUI();
         clearInput();
     };
     var resetGame = function () {
-        score = 0;
-        lives = 5;
-        setMessage("Waiting...");
+        score = config.INITIAL_SCORE;
+        lives = config.INITIAL_LIVES;
+        setMessage(Messages.WAITING);
         clearInput();
         setUI();
     };
@@ -96,12 +105,12 @@ var handleGuesserGame = function () {
     var livesElement = document.querySelector("[data-lives]");
     var highscoreElement = document.querySelector("[data-highscore]");
     var randomNumber = generateRandomNumber(config.MIN, config.MAX);
-    var score = 0;
-    var highscore = 0;
-    var lives = 5;
+    var score = config.INITIAL_SCORE;
+    var highscore = config.INITIAL_HIGHSCORE;
+    var lives = config.INITIAL_LIVES;
     var guessNumber = function () {
         try {
-            if (lives <= 0) {
+            if (lives <= config.LOST_GAME_LIVES) {
                 setHighscore();
                 throw new Error(Errors.END_GAME);
             }
