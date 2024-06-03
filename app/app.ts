@@ -103,6 +103,11 @@ const handleGuesserGame = () => {
   };
 
   const succesfullUI = () => {
+    if (secretNumberElement) {
+      secretNumberElement.textContent = String(randomNumber);
+      secretNumberElement?.classList.add("correct");
+    }
+
     score++;
     randomNumber = generateRandomNumber(config.MIN, config.MAX);
     setMessage(Messages.CORRECT_GUESS);
@@ -127,6 +132,8 @@ const handleGuesserGame = () => {
   const livesElement = document.querySelector<HTMLElement>("[data-lives]");
   const highscoreElement =
     document.querySelector<HTMLElement>("[data-highscore]");
+  const secretNumberElement =
+    document.querySelector<HTMLParagraphElement>("[data-secret]");
 
   let randomNumber = generateRandomNumber(config.MIN, config.MAX);
   let score = config.INITIAL_SCORE;
@@ -134,6 +141,11 @@ const handleGuesserGame = () => {
   let lives = config.INITIAL_LIVES;
 
   const guessNumber = () => {
+    if (secretNumberElement) {
+      secretNumberElement?.classList.remove("correct");
+      secretNumberElement.textContent = "?";
+    }
+
     try {
       if (lives <= config.LOST_GAME_LIVES) {
         setHighscore();

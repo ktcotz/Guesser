@@ -39,6 +39,7 @@
   --color-primary: #e879f9;
   --color-heading: #4a044e;
   --color-neutral: #ffffff;
+  --color-correct: #15803d;
 }
 
 *,
@@ -117,6 +118,13 @@ body {
   justify-content: center;
   font-size: 1.728rem;
   font-weight: 700;
+
+  transition: 0.3s;
+}
+
+.game__secret-number.correct {
+  background-color: var(--color-correct);
+  color: var(--color-neutral);
 }
 
 .game__statistics {

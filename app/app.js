@@ -84,6 +84,10 @@ var handleGuesserGame = function () {
         setUI();
     };
     var succesfullUI = function () {
+        if (secretNumberElement) {
+            secretNumberElement.textContent = String(randomNumber);
+            secretNumberElement === null || secretNumberElement === void 0 ? void 0 : secretNumberElement.classList.add("correct");
+        }
         score++;
         randomNumber = generateRandomNumber(config.MIN, config.MAX);
         setMessage(Messages.CORRECT_GUESS);
@@ -104,11 +108,16 @@ var handleGuesserGame = function () {
     var scoreElement = document.querySelector("[data-score]");
     var livesElement = document.querySelector("[data-lives]");
     var highscoreElement = document.querySelector("[data-highscore]");
+    var secretNumberElement = document.querySelector("[data-secret]");
     var randomNumber = generateRandomNumber(config.MIN, config.MAX);
     var score = config.INITIAL_SCORE;
     var highscore = config.INITIAL_HIGHSCORE;
     var lives = config.INITIAL_LIVES;
     var guessNumber = function () {
+        if (secretNumberElement) {
+            secretNumberElement === null || secretNumberElement === void 0 ? void 0 : secretNumberElement.classList.remove("correct");
+            secretNumberElement.textContent = "?";
+        }
         try {
             if (lives <= config.LOST_GAME_LIVES) {
                 setHighscore();
