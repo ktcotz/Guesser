@@ -1,180 +1,123 @@
-enum Errors {
-  NOT_FOUND_GUESS_INPUT = "Can't find a guess input 🛑",
-  EMPTY_INPUT = "Empty input 🛑",
-  INVALID_INPUT = "Accept numbers between 1-20 🛑",
-  NUMBER_TO_LOW = "Too low!",
-  NUMBER_TO_HIGH = "Too high!",
-  END_GAME = "Game just finished!",
-}
+import { config } from "./config/config";
+import { showError } from "./helpers/dom";
+import { generateRandomNumber, getInputValueAsNumber } from "./helpers/helpers";
+import { Messages, GameErrors, InputErrors } from "./utils/errors";
+import { isValidGuessNumber } from "./validation/validation";
 
-enum Messages {
-  CORRECT_GUESS = "Correct! 😊",
-  WAITING = "Waiting... ✌️",
-}
+const setMessage = (message: string) => {
+  if (!messageElement) return;
 
-const config = {
-  MIN: 1,
-  MAX: 20,
-  INITIAL_SCORE: 0,
-  INITIAL_LIVES: 5,
-  INITIAL_HIGHSCORE: 0,
-  LOST_GAME_LIVES: 0,
+  messageElement.textContent = message;
 };
 
-const handleGuesserGame = () => {
-  const generateRandomNumber = (min: number, max: number) => {
-    return Math.trunc(Math.random() * (max - min) + min);
-  };
+const setUI = () => {
+  if (!scoreElement) return;
 
-  const getGuessInputNumber = () => {
-    if (!guessInput) {
-      throw new Error(Errors.NOT_FOUND_GUESS_INPUT);
-    }
+  scoreElement.textContent = String(score);
 
-    const number = Number(guessInput.value);
+  if (!livesElement) return;
 
-    if (Number.isNaN(number)) {
-      throw new Error(Errors.INVALID_INPUT);
-    }
+  livesElement.textContent = String(lives);
 
-    if (!number) {
-      throw new Error(Errors.EMPTY_INPUT);
-    }
+  if (!highscoreElement) return;
 
-    if (number < config.MIN || number > config.MAX) {
-      throw new Error(Errors.INVALID_INPUT);
-    }
+  highscoreElement.textContent = String(highscore);
+};
 
-    return number;
-  };
+const setHighscore = () => {
+  if (highscore <= score) {
+    highscore = score;
+  }
 
-  const setMessage = (message: string) => {
-    if (!messageElement) return;
-
-    messageElement.textContent = message;
-  };
-
-  const isValidNumber = (guessNumber: number) => {
-    if (guessNumber < randomNumber) {
-      setMessage(Errors.NUMBER_TO_LOW);
-      return false;
-    }
-
-    if (guessNumber > randomNumber) {
-      setMessage(Errors.NUMBER_TO_HIGH);
-      return false;
-    }
-
-    return true;
-  };
-
-  const setUI = () => {
-    if (!scoreElement) return;
-
-    scoreElement.textContent = String(score);
-
-    if (!livesElement) return;
-
-    livesElement.textContent = String(lives);
-
-    if (!highscoreElement) return;
-
-    highscoreElement.textContent = String(highscore);
-  };
-
-  const setHighscore = () => {
-    if (highscore <= score) {
-      highscore = score;
-    }
-
-    score = config.INITIAL_SCORE;
-    setUI();
-  };
-
-  const clearInput = () => {
-    if (!guessInput) return;
-
-    guessInput.value = "";
-  };
-
-  const unsuccesfullUI = () => {
-    lives--;
-    setUI();
-  };
-
-  const succesfullUI = () => {
-    if (secretNumberElement) {
-      secretNumberElement.textContent = String(randomNumber);
-      secretNumberElement?.classList.add("correct");
-    }
-
-    score++;
-    randomNumber = generateRandomNumber(config.MIN, config.MAX);
-    setMessage(Messages.CORRECT_GUESS);
-    setUI();
-    clearInput();
-  };
-
-  const resetGame = () => {
-    score = config.INITIAL_SCORE;
-    lives = config.INITIAL_LIVES;
-    setMessage(Messages.WAITING);
-    clearInput();
-    setUI();
-  };
-
-  const messageElement =
-    document.querySelector<HTMLSpanElement>("[data-message]");
-  const guessInput = document.querySelector<HTMLInputElement>("[data-guess]");
-  const checkButton = document.querySelector<HTMLButtonElement>("[data-check]");
-  const resetButton = document.querySelector<HTMLButtonElement>("[data-reset]");
-  const scoreElement = document.querySelector<HTMLElement>("[data-score]");
-  const livesElement = document.querySelector<HTMLElement>("[data-lives]");
-  const highscoreElement =
-    document.querySelector<HTMLElement>("[data-highscore]");
-  const secretNumberElement =
-    document.querySelector<HTMLParagraphElement>("[data-secret]");
-
-  let randomNumber = generateRandomNumber(config.MIN, config.MAX);
-  let score = config.INITIAL_SCORE;
-  let highscore = config.INITIAL_HIGHSCORE;
-  let lives = config.INITIAL_LIVES;
-
-  const guessNumber = () => {
-    if (secretNumberElement) {
-      secretNumberElement?.classList.remove("correct");
-      secretNumberElement.textContent = "?";
-    }
-
-    try {
-      if (lives <= config.LOST_GAME_LIVES) {
-        setHighscore();
-        throw new Error(Errors.END_GAME);
-      }
-
-      const guessNumber = getGuessInputNumber();
-
-      if (!isValidNumber(guessNumber)) {
-        return unsuccesfullUI();
-      }
-
-      succesfullUI();
-    } catch (err) {
-      if (err instanceof Error) {
-        setMessage(err.message);
-      }
-    }
-  };
-
-  checkButton?.addEventListener("click", () => {
-    guessNumber();
-  });
-
-  resetButton?.addEventListener("click", () => {
-    resetGame();
-  });
-
+  score = config.INITIAL_SCORE;
   setUI();
 };
 
-handleGuesserGame();
+const clearInput = () => {
+  if (!guessInput) return;
+
+  guessInput.value = "";
+};
+
+const unsuccesfullUI = () => {
+  lives--;
+  setUI();
+};
+
+const succesfullUI = () => {
+  if (secretNumberElement) {
+    secretNumberElement.textContent = String(randomNumber);
+    secretNumberElement?.classList.add("correct");
+  }
+
+  score++;
+  randomNumber = generateRandomNumber(config.MIN, config.MAX);
+  setMessage(Messages.CORRECT_GUESS);
+  setUI();
+  clearInput();
+};
+
+const resetGame = () => {
+  score = config.INITIAL_SCORE;
+  lives = config.INITIAL_LIVES;
+  setMessage(Messages.WAITING);
+  clearInput();
+  setUI();
+};
+
+const messageElement =
+  document.querySelector<HTMLSpanElement>("[data-message]");
+const errorElement = document.querySelector<HTMLSpanElement>("[data-message]");
+const guessInput = document.querySelector<HTMLInputElement>("[data-guess]");
+const checkButton = document.querySelector<HTMLButtonElement>("[data-check]");
+const resetButton = document.querySelector<HTMLButtonElement>("[data-reset]");
+const scoreElement = document.querySelector<HTMLElement>("[data-score]");
+const livesElement = document.querySelector<HTMLElement>("[data-lives]");
+const highscoreElement =
+  document.querySelector<HTMLElement>("[data-highscore]");
+const secretNumberElement =
+  document.querySelector<HTMLParagraphElement>("[data-secret]");
+
+let randomNumber = generateRandomNumber(config.MIN, config.MAX);
+let score = config.INITIAL_SCORE;
+let highscore = config.INITIAL_HIGHSCORE;
+let lives = config.INITIAL_LIVES;
+
+const guessNumber = () => {
+  if (secretNumberElement) {
+    secretNumberElement?.classList.remove("correct");
+    secretNumberElement.textContent = "?";
+  }
+
+  try {
+    if (lives <= config.LOST_GAME_LIVES) {
+      setHighscore();
+      throw new Error(GameErrors.END_GAME);
+    }
+
+    const guessNumber = getInputValueAsNumber(guessInput);
+
+    const { isValid, error } = isValidGuessNumber(guessNumber, randomNumber);
+
+    if (!isValid && error) {
+      showError(errorElement, error);
+      return unsuccesfullUI();
+    }
+
+    succesfullUI();
+  } catch (err) {
+    if (err instanceof Error) {
+      setMessage(err.message);
+    }
+  }
+};
+
+checkButton?.addEventListener("click", () => {
+  guessNumber();
+});
+
+resetButton?.addEventListener("click", () => {
+  resetGame();
+});
+
+setUI();
