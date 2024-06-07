@@ -1,7 +1,8 @@
 import { config } from "./config/config";
 import { showError } from "./helpers/dom";
 import { generateRandomNumber, getInputValueAsNumber } from "./helpers/helpers";
-import { Messages, GameErrors, InputErrors } from "./utils/errors";
+import { state } from "./state/state";
+import { Messages, GameErrors } from "./utils/errors";
 import { isValidGuessNumber } from "./validation/validation";
 
 const setMessage = (message: string) => {
@@ -13,23 +14,23 @@ const setMessage = (message: string) => {
 const setUI = () => {
   if (!scoreElement) return;
 
-  scoreElement.textContent = String(score);
+  scoreElement.textContent = String(state.score);
 
   if (!livesElement) return;
 
-  livesElement.textContent = String(lives);
+  livesElement.textContent = String(state.lives);
 
   if (!highscoreElement) return;
 
-  highscoreElement.textContent = String(highscore);
+  highscoreElement.textContent = String(state.highscore);
 };
 
 const setHighscore = () => {
-  if (highscore <= score) {
-    highscore = score;
+  if (state.highscore <= state.score) {
+    state.highscore = state.score;
   }
 
-  score = config.INITIAL_SCORE;
+  state.score = config.INITIAL_SCORE;
   setUI();
 };
 
@@ -40,26 +41,26 @@ const clearInput = () => {
 };
 
 const unsuccesfullUI = () => {
-  lives--;
+  state.lives--;
   setUI();
 };
 
 const succesfullUI = () => {
   if (secretNumberElement) {
-    secretNumberElement.textContent = String(randomNumber);
+    secretNumberElement.textContent = String(state.randomNumber);
     secretNumberElement?.classList.add("correct");
   }
 
-  score++;
-  randomNumber = generateRandomNumber(config.MIN, config.MAX);
+  state.score++;
+  state.randomNumber = generateRandomNumber(config.MIN, config.MAX);
   setMessage(Messages.CORRECT_GUESS);
   setUI();
   clearInput();
 };
 
 const resetGame = () => {
-  score = config.INITIAL_SCORE;
-  lives = config.INITIAL_LIVES;
+  state.score = config.INITIAL_SCORE;
+  state.lives = config.INITIAL_LIVES;
   setMessage(Messages.WAITING);
   clearInput();
   setUI();
@@ -78,11 +79,6 @@ const highscoreElement =
 const secretNumberElement =
   document.querySelector<HTMLParagraphElement>("[data-secret]");
 
-let randomNumber = generateRandomNumber(config.MIN, config.MAX);
-let score = config.INITIAL_SCORE;
-let highscore = config.INITIAL_HIGHSCORE;
-let lives = config.INITIAL_LIVES;
-
 const guessNumber = () => {
   if (secretNumberElement) {
     secretNumberElement?.classList.remove("correct");
@@ -90,14 +86,17 @@ const guessNumber = () => {
   }
 
   try {
-    if (lives <= config.LOST_GAME_LIVES) {
+    if (state.lives <= config.LOST_GAME_LIVES) {
       setHighscore();
       throw new Error(GameErrors.END_GAME);
     }
 
     const guessNumber = getInputValueAsNumber(guessInput);
 
-    const { isValid, error } = isValidGuessNumber(guessNumber, randomNumber);
+    const { isValid, error } = isValidGuessNumber(
+      guessNumber,
+      state.randomNumber
+    );
 
     if (!isValid && error) {
       showError(errorElement, error);
