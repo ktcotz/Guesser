@@ -28,3 +28,4 @@ export const getInputValueAsNumber = (input: HTMLInputElement | null) => {
 
   return inputValueAsNumber;
 };
+
