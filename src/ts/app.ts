@@ -112,6 +112,12 @@ checkButton?.addEventListener("click", () => {
   guessNumber();
 });
 
+document.body.addEventListener("keypress", ({ target, key }) => {
+  if (key === "Enter" && target === guessInput) {
+    guessNumber();
+  }
+});
+
 resetButton?.addEventListener("click", () => {
   resetGame();
 });
